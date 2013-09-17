@@ -1,7 +1,7 @@
 customer-review-crawler
 =======================
 
-An crawler to collect reviews and product infomation on Amazon.com
+An crawler to collect reviews and product infomation on Amazon.com and save them to SQLite databases.
 
 
 # Quick Start Guide
@@ -10,10 +10,11 @@ An crawler to collect reviews and product infomation on Amazon.com
 To get all reviews for a product, first get the Amazon Standard Identification Number (ASIN) of the product. It is the 10-character alphanumeric ID followed by /product/ in the url.
 Then add the following code to the main function
 ```java
-		Item samsungTab3 = new Item("B00D02AGU4");
-		samsungTab3.fetchReview();
-		samsungTab3.writeReviewsToDatabase("c:/reviewtest.db", false);
+	Item samsungTab3 = new Item("B00D02AGU4");
+	samsungTab3.fetchReview();
+	samsungTab3.writeReviewsToDatabase("c:/reviewtest.db", false);
 ```
+Data in the created SQlite database can be managed or exported using tools such as [SQLiteStudio](http://sqlitestudio.pl/) or [RSQLite](http://sandymuspratt.blogspot.com/2012/11/r-and-sqlite-part-1.html)
 
 ## Get reviews from a product category 
 To get all reviews from a product category, first find out the node ID for the category from Amazon.com's url (&node=).
@@ -41,8 +42,8 @@ Once you have them you can change the 2nd argument of writeReviewsToDatabase() t
 
 To test your keys, try
 ```java
-		Item testItem = new Item("B00D02AGU4");
-		System.out.println(testItem.getXMLLargeResponse());
+	Item testItem = new Item("B00D02AGU4");
+	System.out.println(testItem.getXMLLargeResponse());
 ```
 
 
