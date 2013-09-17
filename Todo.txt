@@ -1,0 +1,4 @@
+Todo:
+- Documentation.
+- write to CSV.
+- better logging.
