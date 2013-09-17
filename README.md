@@ -14,11 +14,12 @@ Then add the following code to the main function
 	samsungTab3.fetchReview();
 	samsungTab3.writeReviewsToDatabase("c:/reviewtest.db", false);
 ```
-Data in the created SQlite database can be managed or exported using tools such as [SQLiteStudio](http://sqlitestudio.pl/) or [RSQLite](http://sandymuspratt.blogspot.com/2012/11/r-and-sqlite-part-1.html)
+Data in the created SQlite database can be managed or exported using tools such as [SQLiteStudio](http://sqlitestudio.pl/) or [RSQLite](http://sandymuspratt.blogspot.com/2012/11/r-and-sqlite-part-1.html).
 
 ## Get reviews from a product category 
-To get all reviews from a product category, first find out the node ID for the category from Amazon.com's url (&node=).
-
+To get all reviews from a product category, find out the node ID for the category from Amazon.com's url (&node=). The node ID will be the first arugument in the GetASINbyNode() constructor.
+Then you should estimate about how many products there are and divide that number by 5, which will be the third argument in GetASINbyNode().
+For example:
 ```java
 	GetTabletASIN getTabletid = new GetASINbyNode("541966%2C1232597011", 1,	300);
 	getTabletid.getIDList();
@@ -38,7 +39,7 @@ You also need your Product Advertising API Key & Secret Key and add them to Sign
 	private String awsAccessKeyId = "your_api_key";
 	private String awsSecretKey = "your_seceret_key";
 ```
-Once you have them you can change the 2nd argument of writeReviewsToDatabase() to true, and pricing information will be saved in the same database in XML format.
+Once you have them you can change the second argument of writeReviewsToDatabase() to true, and pricing information will be saved in the same database in XML format.
 
 To test your keys, try
 ```java
