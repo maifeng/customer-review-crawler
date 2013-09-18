@@ -1,7 +1,7 @@
 customer-review-crawler
 =======================
 
-An crawler to collect reviews and product infomation on Amazon.com and save them to SQLite databases.
+A crawler to collect reviews and product infomation on Amazon.com and save them to SQLite databases.
 
 
 # Quick Start Guide
