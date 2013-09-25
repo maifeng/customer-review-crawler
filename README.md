@@ -49,6 +49,10 @@ To test your keys, try
 
 
 
-# Common Exceptions:
+# Common Exceptions
 1. java.io.IOException means that the item no longer exist on Amazon.com. You do not have to do anything with that item.
 2. java.net.SocketTimeoutException means that connection to the website is taking too long. Rerun the crawler on the items with this exception.
+
+# Licence
+The code is released into public domain. If you find the code useful in your research work, I appreciate if you can cite 
+"Market Dynamics and User-Generated Content about Tablet Computers" by Xin (Shane) Wang, Feng Mai and Roger H.L. Chiang, accepted by Marketing Science, 2013.
