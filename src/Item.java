@@ -57,7 +57,7 @@ public class Item {
 		try {
 			// Get the max number of review pages;
 			org.jsoup.nodes.Document reviewpage1 = null;
-			reviewpage1 = Jsoup.connect(url).get();
+			reviewpage1 = Jsoup.connect(url).timeout(10*1000).get();
 			int maxpage = 1;
 			Elements pagelinks = reviewpage1.select("a[href*=pageNumber=]");
 			if (pagelinks.size() != 0) {
@@ -78,7 +78,7 @@ public class Item {
 						+ "/?showViewpoints=0&sortBy=byRankDescending&pageNumber="
 						+ p;
 				org.jsoup.nodes.Document reviewpage = null;
-				reviewpage = Jsoup.connect(url).get();
+				reviewpage = Jsoup.connect(url).timeout(10*1000).get();
 				if (reviewpage.select("table[id=productReviews]").isEmpty()) {
 					System.out.println(itemID + " " + "no reivew");
 				} else {

@@ -41,7 +41,7 @@ public class GetASINbyNode implements GetID{
 	
 	public void getIDList() throws IOException{
 		for (int i = from; i <= to; i++) {
-			String thepage = readWebPage("http://www.amazon.com/gp/aw/s/ref=is_pg_2_1?n="+nodeid+"&p="+i+"&p_72=1248882011&s=reviewrank_authority");
+			String thepage = readWebPage("http://www.amazon.com/gp/aw/s/ref=is_pg_2_1?n="+nodeid+"&p="+i+"&p_72=1248882011&s=salesrank");
 			//System.out.println(thepage);
 			DateTime dt = new DateTime();
 			System.out.println(dt+ "Page "+i);
