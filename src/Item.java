@@ -183,8 +183,7 @@ public class Item {
 				.parse(datetext);
 
 		// review content
-		Element contentDoc = doc.select("div[style*=margin-left]").first();
-		contentDoc.select("div").remove();
+		Element contentDoc = doc.getElementsByClass("reviewText").first();
 		content = contentDoc.text();
 		Review thereview = new Review(theitemID, reviewID, customerName,
 				customerID, title, rating, fullRating, helpfulVotes,
