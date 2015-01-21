@@ -55,4 +55,4 @@ To test your keys, try
 
 # Licence
 The code is released into public domain. If you find the code useful in your research work, I appreciate if you can cite 
-"Market Dynamics and User-Generated Content about Tablet Computers" by Xin (Shane) Wang, Feng Mai and Roger H.L. Chiang, Marketing Science, Forthcoming 2014.
+"Market Dynamics and User-Generated Content about Tablet Computers" by Xin (Shane) Wang, Feng Mai and Roger H.L. Chiang, Marketing Science 33.3 (2014): 449-458

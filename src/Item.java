@@ -160,12 +160,12 @@ public class Item {
 				.getElementsContainingOwnText("people found the following review helpful");
 		if (votings.size() > 0) {
 			String votingtext = votings.first().text();
-			Pattern pattern2 = Pattern.compile("(\\d+)( of )(\\d+)");
+			Pattern pattern2 = Pattern.compile("(\\S+)( of )(\\S+)");
 			Matcher matcher2 = pattern2.matcher(votingtext);
 			matcher2.find();
 			// customer id;
-			helpfulVotes = Integer.parseInt(matcher2.group(1));
-			totalVotes = Integer.parseInt(matcher2.group(3));
+			helpfulVotes = Integer.parseInt(matcher2.group(1).replaceAll(",", ""));
+			totalVotes = Integer.parseInt(matcher2.group(3).replaceAll(",", ""));
 		}
 
 		// verified purchase and real name
