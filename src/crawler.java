@@ -19,10 +19,11 @@ public class crawler {
 			ClassNotFoundException, SQLException, InvalidKeyException,
 			NoSuchAlgorithmException, InterruptedException {
 
-		//example: write all reviews for Samsung Tab 3 to a SQLite database
-		Item samsungTab3 = new Item("B00D02AGU4");
-		samsungTab3.fetchReview();
-		samsungTab3.writeReviewsToDatabase("c:/reviewtest.db", false);
+		//example: write all reviews for an item (defined by its ASIN) to a SQLite database
+		Item an_item = new Item("B00OLT7QSU");
+		an_item.fetchReview();
+		an_item.writeReviewsToDatabase("reviewtest.db", false);
+
 	}
 
 }

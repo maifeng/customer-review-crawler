@@ -70,26 +70,21 @@ public class Item {
 				}
 				maxpage = Collections.max(pagenum);
 			}
-
 			// collect review from each of the review pages;
 			for (int p = 1; p <= maxpage; p = p + 1) {
 				url = "http://www.amazon.com/product-reviews/"
 						+ itemID
-						+ "/?showViewpoints=0&sortBy=byRankDescending&pageNumber="
+						+ "/?sortBy=helpful&pageNumber="
 						+ p;
 				org.jsoup.nodes.Document reviewpage = null;
-				reviewpage = Jsoup.connect(url).timeout(10*1000).get();
-				if (reviewpage.select("table[id=productReviews]").isEmpty()) {
+                reviewpage = Jsoup.connect(url).timeout(10*1000).get();
+				if (reviewpage.select("div.a-section.review").isEmpty()) {
 					System.out.println(itemID + " " + "no reivew");
 				} else {
-					Element reviewsHTML = reviewpage.select(
-							"table[id=productReviews]").first();
-					List<String> reviewBlocks = new ArrayList<String>(
-							Arrays.asList(reviewsHTML.toString().split(
-									"<!-- BOUNDARY -->")));
-					reviewBlocks.remove(0);
-					for (String reviewBlock : reviewBlocks) {
-						Review theReview = cleanReviewBlock(reviewBlock);
+					Elements reviewsHTMLs = reviewpage.select(
+							"div.a-section.review");
+					for (Element reviewBlock : reviewsHTMLs) {
+                        Review theReview = cleanReviewBlock(reviewBlock);
 						this.addReview(theReview);
 					}
 				}
@@ -106,12 +101,11 @@ public class Item {
 	 * cleans the html block that contains a review
 	 * 
 	 * @param reviewBlock
-	 *            a html review block
+	 *            a html review block (Jsoup Element)
 	 * @return
 	 * @throws ParseException
 	 */
-	public Review cleanReviewBlock(String reviewBlock) throws ParseException {
-		org.jsoup.nodes.Document doc = Jsoup.parse(reviewBlock);
+	public Review cleanReviewBlock(Element reviewBlock) throws ParseException {
 		String theitemID = this.itemID;
 		String reviewID = "";
 		String customerName = "";
@@ -122,16 +116,15 @@ public class Item {
 		int helpfulVotes = 0;
 		int totalVotes = 0;
 		boolean verifiedPurchase = false;
-		boolean realName = false;
+		String realName = "N/A"; //Note 2015-11-14 : Amazon seems to got rid of the real name badge
 
 		String content = "";
 
 		// review id
-		Elements reviewIDs = doc.getElementsByAttribute("name");
-		reviewID = reviewIDs.first().attr("name");
-
-		// customer name and id
-		Elements customerIDs = doc.getElementsByAttributeValueContaining(
+		reviewID = reviewBlock.id();
+//        System.out.println(reviewID);
+        // customer name and id
+		Elements customerIDs = reviewBlock.getElementsByAttributeValueContaining(
 				"href", "/gp/pdp/profile/");
 		if (customerIDs.size() > 0) {
 			Element customer = customerIDs.first();
@@ -144,22 +137,20 @@ public class Item {
 			customerID = matcher.group(2);
 			// customer name;
 			customerName = customer.text();
-		}
+        }
 		// title
-		Elements reviewTitles = doc.getElementsByAttributeValue("style",
-				"vertical-align:middle;");
-		title = reviewTitles.first().getElementsByTag("b").text();
+		Element reviewTitle = reviewBlock.select("a.review-title").first();
+		title = reviewTitle.text();
 
 		// rating
-		Elements stars = doc.getElementsByClass("swSprite");
-		String starinfo = stars.first().text();
+		Element star = reviewBlock.select("i.a-icon-star").first();
+		String starinfo = star.text();
 		rating = Integer.parseInt(starinfo.substring(0, 1));
 
 		// usefulness voting
-		Elements votings = doc
-				.getElementsContainingOwnText("people found the following review helpful");
-		if (votings.size() > 0) {
-			String votingtext = votings.first().text();
+		Elements votes = reviewBlock.select("span.review-votes");
+		if (votes.size() > 0) {
+			String votingtext = votes.first().text();
 			Pattern pattern2 = Pattern.compile("(\\S+)( of )(\\S+)");
 			Matcher matcher2 = pattern2.matcher(votingtext);
 			matcher2.find();
@@ -168,27 +159,27 @@ public class Item {
 			totalVotes = Integer.parseInt(matcher2.group(3).replaceAll(",", ""));
 		}
 
-		// verified purchase and real name
-		Elements verified = doc.getElementsByClass("crVerifiedStripe");
-		if (verified.size() > 0)
-			verifiedPurchase = true;
-		Elements realname = doc.getElementsByClass("s_BadgeRealName");
-		if (realname.size() > 0)
-			realName = true;
+		// verified purchase
+		Elements verified = reviewBlock.select("span.a-size-mini:contains(Verified Purchase)");
+		if (verified.size() > 0){
+            verifiedPurchase = true;
+        }
+
 
 		// review date
-		Elements date = doc.getElementsByTag("nobr");
-		String datetext = date.first().text();
-		Date reviewDate = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH)
+		Elements date = reviewBlock.select("span.review-date");
+        String datetext = date.first().text();
+        datetext = datetext.substring(3); // remove "On "
+        Date reviewDate = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH)
 				.parse(datetext);
 
 		// review content
-		Element contentDoc = doc.getElementsByClass("reviewText").first();
+		Element contentDoc = reviewBlock.select("span.review-text").first();
 		content = contentDoc.text();
 		Review thereview = new Review(theitemID, reviewID, customerName,
 				customerID, title, rating, fullRating, helpfulVotes,
 				totalVotes, verifiedPurchase, realName, reviewDate, content);
-		return thereview;
+        return thereview;
 	}
 
 	/**

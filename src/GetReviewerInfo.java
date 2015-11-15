@@ -18,7 +18,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * Get reviewer's demographics and other information; This class was added at a
+ * Get reviewer's demographics and other information (including the 10 most recent review star ratings)
+ * This class was added at a
  * later date; the reviewer information is added to a separate SQLite database.
  * 
  * @author Feng Mai
@@ -35,10 +36,12 @@ public class GetReviewerInfo {
 	public GetReviewerInfo(String aReviewIDFile, String anOutputDB) {
 		this.ReviewIDFile = aReviewIDFile;
 		this.outputDB = anOutputDB;
+        this.create_data_base();
 	}
 
 	public ArrayList<String> reviewer_info(String reviewerID) {
-		String url = "http://www.amazon.com/gp/pdp/profile/" + reviewerID;
+        System.out.println("Reviewer: " + reviewerID);
+        String url = "http://www.amazon.com/gp/pdp/profile/" + reviewerID;
 		String url2 = "http://www.amazon.com/gp/cdp/member-reviews/"
 				+ reviewerID + "/?sort_by=MostRecentReview";
 		Document doc = null;
@@ -49,55 +52,64 @@ public class GetReviewerInfo {
 		String Location = "";
 		List<String> Recent_rating = new ArrayList<>();
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = Jsoup.connect(url).header("User-Agent",
+                    "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2").get();
 
-			Elements Reviewer_ranking_e = doc
-					.getElementsContainingOwnText("Top Reviewer Ranking:");
-			Pattern pattern = Pattern.compile("(Top Reviewer Ranking: )(\\S+)");
+            // reviewer ranking
+			Elements Reviewer_ranking_e = doc.select("span.a-size-small:contains(Reviewer Ranking: #)");
+            System.out.println(Reviewer_ranking_e);
+            Pattern pattern = Pattern.compile("(Reviewer ranking: #)(\\S+)");
 			Matcher matcher = pattern.matcher(Reviewer_ranking_e.text());
-			while (matcher.find()) {
+			if (matcher.find()) {
 				Reviewer_ranking = matcher.group(2);
 			}
 
-			pattern = Pattern
-					.compile("(Total Helpful Votes: )(\\d+)( of )(\\d+)");
-			matcher = pattern.matcher(Reviewer_ranking_e.text());
-			while (matcher.find()) {
-				Total_helpful_votes = matcher.group(2) + " of "
-						+ matcher.group(4);
-			}
+            // review helpful votes
+			Element total_vote = doc.select("span.a-size-small:contains(votes received on reviews)").first();
+            if(total_vote != null){
+                Element vote_parent = total_vote.parent();
+                String votes_string = vote_parent.select("span:contains( of )").text();
+                pattern = Pattern
+                        .compile("([(])(\\S+)( of )(\\S+)([)])");
+                matcher = pattern.matcher(votes_string);
+                if(matcher.find()){
+                    Total_helpful_votes = matcher.group(2) + " of "
+                            + matcher.group(4);
+                }
+            }
 
-			Elements Total_reviews_e = doc.getElementsByClass("seeAll");
-			pattern = Pattern.compile("(See all )(\\S+)( reviews)");
-			matcher = pattern.matcher(Total_reviews_e.text());
-			while (matcher.find()) {
-				Total_reviews = matcher.group(2);
-			}
+            // total number of reviews
+			Element Total_reviews_e = doc.select("div.reviews-link").first();
+            if(Total_reviews_e != null){
+                pattern = Pattern.compile("(Reviews [(])((\\S+))([)])");
+                matcher = pattern.matcher(Total_reviews_e.text());
+                if (matcher.find()) {
+                    Total_reviews = matcher.group(2);
+                }
+            }
 
-			try {
-				Element Location_e = doc.getElementsByClass("personalDetails")
-						.first().getElementsByIndexEquals(0).first();
-				if (Location_e.text().contains("Location")) {
-					Location = Location_e.text();
-					Location = Location.replace("'", "");
-				}
-			} catch (Exception e) {
+            // location of the reviewer (if listed)
+            Element Location_e = doc.select("div.profile-name-container").first();
+            if(Location_e.parent() != null)
+                Location = Location_e.parent().text();
 
-			}
 
+            //recent 10 ratings
 			doc = Jsoup.connect(url2).get();
 			Elements images = doc.select("img");
 			for (Element image : images) {
 				String imagealt = image.attr("alt");
-				if (imagealt.contains("out of 5 stars")) {
-					Recent_rating.add(imagealt.substring(0, 1));
-				}
-			}
+                if (imagealt.contains("out of 5 stars")) {
+                    Recent_rating.add(imagealt.substring(0, 1));
+                }
+            }
 
 		} catch (IOException e) {
-			System.out.println(reviewerID + " Removed");
+            System.out.println(e);
+            System.out.println(reviewerID + " Removed");
 			return (null);
 		}
+
 		if (Recent_rating.size() > 10) {
 			Recent_rating = Recent_rating.subList(0, 10);
 		} else {
@@ -135,7 +147,7 @@ public class GetReviewerInfo {
 					c = DriverManager
 							.getConnection("jdbc:sqlite:"+outputDB);
 					c.setAutoCommit(false);
-					System.out.println(insert_q);
+//					System.out.println(insert_q);
 					stmt = c.createStatement();
 					String sql = insert_q;
 					stmt.executeUpdate(sql);
@@ -176,7 +188,6 @@ public class GetReviewerInfo {
 			c.close();
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			System.exit(0);
 		}
 		System.out.println("Table created successfully");
 	}

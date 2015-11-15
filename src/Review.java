@@ -2,6 +2,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.sql.*;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 public class Review {
 	/**
@@ -29,7 +30,7 @@ public class Review {
 	 *            whether the review is from a verified purchase
 	 * @param realnameornot
 	 *            whether the customer is using his real name when writing the
-	 *            review
+	 *            review (obsolete, amazon no longer displays the badge)
 	 * @param aReviewDate
 	 *            date of the review
 	 * @param acontent
@@ -38,7 +39,7 @@ public class Review {
 	public Review(String aitemID, String areviewID, String acustomerName,
 			String acustomerID, String atitle, int arating, int afullRating,
 			int ahelpfulVotes, int atotalVotes, boolean verifiedornot,
-			boolean realnameornot, Date aReviewDate, String acontent) {
+			String realnameornot, Date aReviewDate, String acontent) {
 		itemID = aitemID;
 		reviewID = areviewID;
 		customerName = acustomerName;
@@ -103,10 +104,14 @@ public class Review {
 
 	}
 
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this);
+	}
+
 	public void updateReview(String aitemid, String areviewid,
 			String acustomername, String acustomerID, String atitle,
 			double arating, double afullRating, int ahelpfulVotes,
-			int atotalVotes, boolean verified, boolean realname,
+			int atotalVotes, boolean verified, String realname,
 			Date areviewDate, String acontent) {
 		this.itemID = aitemid;
 		this.reviewID = areviewid;
@@ -133,7 +138,7 @@ public class Review {
 	int helpfulVotes;
 	int totalVotes;
 	boolean verifiedPurchase;
-	boolean realName;
+	String realName;
 	Date reviewDate;
 	String content;
 }

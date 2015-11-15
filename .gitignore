@@ -1,6 +1,7 @@
-.settings
-bin
-.metadata
-.project
-.idea
-.iml
+*.settings
+bin/
+*.metadata
+*.project
+*.idea
+*.iml
+out/
