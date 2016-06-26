@@ -62,6 +62,7 @@ To test your keys, try
 
 # Update Log
 2015-11-14 updated to reflect changes on Amazon website.
+
 2016-06-25 Amazon is no longer displaying total number of helpful votes.
 
 # Licence
